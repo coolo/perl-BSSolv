@@ -616,7 +616,7 @@ retrieve(unsigned char **srcp, STRLEN *srclp, int depth)
       for (i = 0; i < len; i++)
 	{
 	  sv = retrieve(&src, &srcl, depth + 1);
-	  if (!sv) 
+	  if (!sv)
 	    return 0;
 	  if (srcl < 4)
 	    return 0;
@@ -635,7 +635,7 @@ retrieve(unsigned char **srcp, STRLEN *srclp, int depth)
     case 4:
       rv = NEWSV(10002, 0);
       sv = retrieve(&src, &srcl, depth + 1);
-      if (!sv) 
+      if (!sv)
 	return 0;
       sv_upgrade(rv, SVt_RV);
       SvRV_set(rv, sv);
@@ -915,7 +915,7 @@ normalize_dep(ExpanderCtx *xpctx, Id dep, Queue *bq, int flags)
 {
   Pool *pool = xpctx->pool;
   Id p, dp;
-  
+
   if (pool_is_complex_dep(pool, dep))
     {
       Reldep *rd = GETRELDEP(pool, dep);
@@ -1040,11 +1040,11 @@ static const char *
 expander_solvid2name(Expander *xp, Id p)
 {
   const char *n = pool_id2str(xp->pool, xp->pool->solvables[p].name);
-  Repo *r; 
+  Repo *r;
   if (!xp->debug)
     return n;
   r = xp->pool->solvables[p].repo;
-  if (!r) 
+  if (!r)
     return n;
   return pool_tmpjoin(xp->pool, n, "@", r->name);
 }
@@ -1053,11 +1053,11 @@ static const char *
 expander_solvid2str(Expander *xp, Id p)
 {
   const char *n = pool_solvid2str(xp->pool, p);
-  Repo *r; 
+  Repo *r;
   if (!xp->debug)
     return n;
   r = xp->pool->solvables[p].repo;
-  if (!r) 
+  if (!r)
     return n;
   return pool_tmpjoin(xp->pool, n, "@", r->name);
 }
@@ -1601,7 +1601,7 @@ expander_installed_multiple(ExpanderCtx *xpctx, Queue *toinstall)
 	}
     }
   queue_truncate(toinstall, j);
-  
+
   /* run conditionals first */
   if (havecond)
     recheck_conddeps(xpctx);
@@ -1685,10 +1685,10 @@ static int
 expander_dep_fulfilled(ExpanderCtx *xpctx, Id dep)
 {
   Pool *pool = xpctx->pool;
-  Id p, pp; 
+  Id p, pp;
 
   if (ISRELDEP(dep))
-    {   
+    {
       Reldep *rd = GETRELDEP(pool, dep);
       if (rd->flags == REL_COND)
 	{
@@ -2246,7 +2246,7 @@ expander_expand(Expander *xp, Queue *in, Queue *indep, Queue *out, Queue *ignore
 
       if (pass == 1)
 	queue_empty(&choices);
-	
+
       for (ti = tj = 0; ti < xpctx.todo.count; ti += 2)
 	{
 	  int deptype = DEPTYPE_REQUIRES;
@@ -2868,7 +2868,7 @@ in_module_map(Pool *pool, Map *modulemap, Queue *modules)
 {
   int i;
   for (i = 0; i < modules->count; i++)
-    { 
+    {
       Id id = modules->elements[i];
       if (id > 1 && id < pool->ss.nstrings && MAPTST(modulemap, id))
 	return 1;
@@ -2894,7 +2894,7 @@ create_considered(Pool *pool, Repo *repoonly, Map *considered, int unorderedrepo
 
   map_init(considered, pool->nsolvables);
   best = solv_calloc(sizeof(Id), pool->ss.nstrings);
-  
+
   queue_init(&modules);
   map_init(&modulemap, 0);
   queue_init(&modulemapq);
@@ -3051,11 +3051,11 @@ static char *
 slurp(FILE *fp, int *lenp)
 {
   int l, ll;
-  char *buf = 0; 
-  int bufl = 0; 
+  char *buf = 0;
+  int bufl = 0;
 
   for (l = 0; ; l += ll)
-    {    
+    {
       if (bufl - l < 4096)
         {
           bufl += 4096;
@@ -3067,11 +3067,11 @@ slurp(FILE *fp, int *lenp)
 	    }
           buf = solv_realloc(buf, bufl);
         }
-      ll = fread(buf + l, 1, bufl - l, fp); 
-      if (ll < 0) 
+      ll = fread(buf + l, 1, bufl - l, fp);
+      if (ll < 0)
         {
           buf = solv_free(buf);
-          l = 0; 
+          l = 0;
           break;
         }
       if (ll == 0)
@@ -3079,10 +3079,10 @@ slurp(FILE *fp, int *lenp)
           buf[l] = 0;   /* always zero-terminate */
           break;
         }
-    }    
+    }
   if (lenp)
-    *lenp = l; 
-  return buf; 
+    *lenp = l;
+  return buf;
 }
 
 
@@ -3488,7 +3488,7 @@ static unsigned int buz_noise[256] =
 };
 
 
-/* 
+/*
  * our delta search blocksize
  *
  * smaller gives more hits, but increases the hash size
@@ -3695,7 +3695,7 @@ addslotarea(struct deltastore *store, int cnt)
   return 1;
 }
 
-/* 
+/*
  * add a new block to the store.
  * returns the store offset, 0 on error
  */
@@ -3799,7 +3799,7 @@ checkstore(struct deltastore *store, unsigned long long offset, unsigned char *b
   return 1;
 }
 
-/* 
+/*
  * try to find a (non-rolling) block in the store. If not found, add it.
  * returns the store offset, 0 on error
  */
@@ -5272,6 +5272,88 @@ find_corresponding_dod(Solvable *s)
   return 0;
 }
 
+static void 
+detect_cycles_scc(int v, Queue *edata, Queue *vedge, int *index, Queue *stack, int *indeces, int *lowlinks, int *onstack, char **names, AV *cycles)
+{
+       indeces[v] = *index;
+       lowlinks[v] = *index;
+
+       *index += 1;
+       queue_push(stack, v);
+       onstack[v] = 1;
+
+       Id *e = edata->elements + vedge->elements[v];
+       for (; *e; e++) {
+            if (indeces[*e] == -1) {
+                     /* Successor has not yet been visited; recurse on it */
+                     detect_cycles_scc(*e, edata, vedge, index, stack, indeces, lowlinks, onstack, names, cycles);
+                     lowlinks[v] = MIN(lowlinks[v], lowlinks[*e]);
+              } else if (onstack[*e] == 1) {
+                     /* Successor w is in stack S and hence in the current SCC
+                        If w is not on stack, then (v, w) is an edge pointing to an SCC already found and must be ignored
+                        Note: The next line may look odd - but is correct.
+                        It says w.index not w.lowlink; that is deliberate and from the original paper */
+                lowlinks[v] = MIN(lowlinks[v], indeces[*e]);
+              }
+       }
+
+        /* If v is a root node, pop the stack and generate an SCC */
+        if (lowlinks[v] == indeces[v]) {
+            /* start a new strongly connected component */
+            int w;
+            Queue skz;
+            queue_init(&skz);
+
+            do {
+              w = queue_pop(stack);
+              onstack[w] = 0;
+              queue_push(&skz, w);
+            } while (w != v);
+
+            if (skz.count > 1) {
+                   int i;
+                   AV *av2 = newAV();
+
+                  for (i = 0; i < skz.count; i++) 
+                  {
+       
+                     SV *sv = newSVpv(names[skz.elements[i]], 0);
+                     av_push(av2, sv);
+                  }
+                  av_push(cycles, newRV_noinc((SV*)av2));
+            }
+            queue_free(&skz);
+        }  
+}
+
+/* https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm */
+static void 
+detect_cycles(Queue *edata, Queue *vedge, char **names, AV *cycles)
+{
+       int index = 0;
+       Queue stack;
+       queue_init(&stack);
+       int *indeces = solv_calloc(vedge->count, sizeof(int));
+       int *lowlinks = solv_calloc(vedge->count, sizeof(int));
+       int *onstack = solv_calloc(vedge->count, sizeof(int));
+       int i;
+       for (i = 1; i < vedge->count; i++) {
+              indeces[i] = -1;
+              lowlinks[i] = -1;
+              onstack[i] = 0;
+       }
+	
+       for (i = 1; i < vedge->count; i++)
+	{
+          detect_cycles_scc(i, edata, vedge, &index, &stack, indeces, lowlinks, onstack, names, cycles);
+       }
+
+       queue_free(&stack);
+       solv_free(indeces);
+       solv_free(lowlinks);
+       solv_free(onstack);
+}
+
 MODULE = BSSolv		PACKAGE = BSSolv
 
 void
@@ -5302,9 +5384,9 @@ depsort(HV *deps, SV *mapp, SV *cycp, ...)
 	    if (ix)
 	      {
 		/* called as depsort2 */
-		if (items < 4)
+		if (items < 4) 
 		  XSRETURN_EMPTY; /* nothing to sort */
-		pkgstart = 4;
+       	pkgstart = 4;
 		pkg2srcp = cycp;
 		cycp = ST(3);
 	      }
@@ -5459,10 +5541,14 @@ depsort(HV *deps, SV *mapp, SV *cycp, ...)
 		    Id *e = edata.elements + vedge.elements[i];
 		    for (; *e; e++)
 		      printf(" %d", *e);
-		    printf("\n");
-		  }
+                   printf("\n");
+                }
 	      }
-		
+
+           if (cycp && SvROK(cycp) && SvTYPE(SvRV(cycp)) == SVt_PVAV) {
+                  AV *av = (AV *)SvRV(cycp);
+                  detect_cycles(&edata, &vedge, names, av);
+           }
 
 	    /* now everything is set up, sort em! */
 	    mark = solv_calloc(vedge.count, sizeof(Id));
@@ -5543,25 +5629,9 @@ depsort(HV *deps, SV *mapp, SV *cycp, ...)
 		todo.count = cycstart + 1;
 	      }
 
-	    /* recored cycles */
-	    if (cycles.count && cycp && SvROK(cycp) && SvTYPE(SvRV(cycp)) == SVt_PVAV)
-	      {
-		AV *av = (AV *)SvRV(cycp);
-		for (i = 0; i < cycles.count;)
-		  {
-		    AV *av2 = newAV();
-		    for (; cycles.elements[i]; i++)
-		      {
-			SV *sv = newSVpv(names[cycles.elements[i]], 0);
-			av_push(av2, sv);
-		      }
-		    av_push(av, newRV_noinc((SV*)av2));
-		    i++;
-		  }
-	      }
-	    queue_free(&cycles);
+           queue_free(&cycles);
 
-	    queue_free(&edata);
+           queue_free(&edata);
 	    queue_free(&vedge);
 	    queue_free(&todo);
 	    solv_free(mark);
@@ -5633,7 +5703,7 @@ gen_meta(AV *subp, ...)
 		for (s2 = lo; *s2; s2++)
 		  if (*s2 == '/')
 		    {
-		      if (!cycle)	
+		      if (!cycle)
 			{
 			  *s2 = 0;
 			  h = strhash(lo) & hm;
@@ -6022,7 +6092,7 @@ obscpioopen(const char *file, const char *store, SV *gvrv, const char *tmpdir = 
 		}
 	    }
 	}
-	
+
     OUTPUT:
 	RETVAL
 
@@ -6091,7 +6161,7 @@ makeobscpio(const char *in, const char *store, const char *out)
 	    struct stat st;
 	    int fdstore;
 	    RETVAL = 0;
-	    if ((fpin = fopen(in, "r")) == 0) {	
+	    if ((fpin = fopen(in, "r")) == 0) {
 		perror(in);
 	    } else if (fstat(fileno(fpin), &st) != 0) {
 		perror(in);
@@ -6389,7 +6459,7 @@ consideredpackages(BSSolv::pool pool)
 	      if (MAPTST(pool->considered, p))
 		PUSHs(sv_2mortal(newSViv((IV)p)));
 	}
-	
+
 void
 allpackages(BSSolv::pool pool)
     PPCODE:
@@ -6472,7 +6542,7 @@ pkg2path(BSSolv::pool pool, int p)
 	}
     OUTPUT:
 	RETVAL
-	
+
 const char *
 pkg2fullpath(BSSolv::pool pool, int p, char *myarch)
     CODE:
@@ -6858,7 +6928,7 @@ pkgpaths(BSSolv::repo repo)
 	    Map c;
 	    const char *str;
 	    unsigned int medianr;
-	
+
 	    create_considered(pool, repo, &c, 0);
 	    EXTEND(SP, 2 * repo->nsolvables);
 	    FOR_REPO_SOLVABLES(repo, p, s)
@@ -7786,7 +7856,7 @@ debugstr(BSSolv::expander xp)
 
 const char *
 debugstrclr(BSSolv::expander xp)
-	
+
     CODE:
 	RETVAL = xp->debugstr ? xp->debugstr : "";
     OUTPUT:
@@ -7798,4 +7868,3 @@ void
 DESTROY(BSSolv::expander xp)
     CODE:
 	expander_free(xp);
-
